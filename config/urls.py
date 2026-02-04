@@ -17,18 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from gallery.views import home
-<<<<<<< HEAD
-from gallery.views import about
-=======
 #from gallery.views import about
->>>>>>> 87bd81218b2403698da58a79e0260e719006e304
 
 urlpatterns = [
 path('admin/', admin.site.urls),
 path('', home, name='home'),
-<<<<<<< HEAD
-path('about/', about, name='about')
-=======
 #path('about/', about, name='about'),
->>>>>>> 87bd81218b2403698da58a79e0260e719006e304
 ]

@@ -1,11 +1,6 @@
 from django.shortcuts import render
 
 def home(request):
-<<<<<<< HEAD
-    return HttpResponse("<h1>Добро пожаловать в 3D Хранилище</h1><p>Система работает.</p>")
-def about(request):
-    return HttpResponse("<h1>Курс Web Структуры</h1>")
-=======
     context_data = {
         'page_title': 'Главная Галерея',
         'models_count': 5,
@@ -24,4 +19,3 @@ def home(request):
         'assets': fake_database, # Передаем весь список
     }
     return render(request, 'gallery/index.html', context_data)
->>>>>>> 87bd81218b2403698da58a79e0260e719006e304
