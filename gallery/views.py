@@ -1,8 +1,27 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-# Create your views here.
 
 def home(request):
+<<<<<<< HEAD
     return HttpResponse("<h1>Добро пожаловать в 3D Хранилище</h1><p>Система работает.</p>")
 def about(request):
     return HttpResponse("<h1>Курс Web Структуры</h1>")
+=======
+    context_data = {
+        'page_title': 'Главная Галерея',
+        'models_count': 5,
+    }
+    return render(request, 'gallery/index.html', context_data) 
+
+def home(request):
+# Имитация данных из базы (список словарей)
+    fake_database = [
+        {'id': 1, 'name': 'Sci-Fi Helmet', 'file_size': '15 MB'},
+        {'id': 2, 'name': 'Old Chair', 'file_size': '2 MB'},
+        {'id': 3, 'name': 'Cyber Truck', 'file_size': '10 MB'},
+    ]
+    context_data = {
+        'page_title': 'Главная Галерея',
+        'assets': fake_database, # Передаем весь список
+    }
+    return render(request, 'gallery/index.html', context_data)
+>>>>>>> 87bd81218b2403698da58a79e0260e719006e304
