@@ -14,10 +14,10 @@
         <ul>
             {% for asset in assets %}
                 <li>
-                    <strong>{{ asset.name }}</strong>
-                    <small>(Размер: {{ asset.file_size }})</small>
+                    <strong>{{ asset.title }}</strong>
+                    <small>(Размер: {{ asset.file_size|filesizeformat }})</small>
                     <!-- Ссылка-заглушка -->
-                    <a href="#">[Скачать]</a>
+                    <a href="{{asset.file.url}}" download>[Скачать]</a>
                 </li>
             {% empty %}
             <!-- Этот блок сработает, если список assets пустой -->
