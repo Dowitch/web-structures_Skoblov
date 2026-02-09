@@ -16,3 +16,5 @@ def home(request):
         'assets': assets, # Передаем весь список
     }
     return render(request, 'gallery/index.html', context_data)
+def upload(request):
+    return render(request, 'gallery/upload.html')

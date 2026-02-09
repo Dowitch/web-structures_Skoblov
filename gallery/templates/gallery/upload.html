@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>New model upload</title>
+</head>
+<body>
+    <h1>Загрузить новую модель</h1>
+    
+    <form>
+        <label>Название: <input type="text" name="title"></label><br><br>
+        <label>Файл: <input type="file" name="file"></label><br><br>
+        <button type="submit">Отправить</button>
+    </form>
+
+    <br>
+    <a href="{% url 'home' %}">Вернуться на главную</a>
+</body>
+</html>

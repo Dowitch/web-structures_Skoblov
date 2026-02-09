@@ -11,6 +11,11 @@
    <main>
         <h2>Доступные ассеты:</h2>
         <!-- Цикл for в шаблоне Django -->
+        <p>
+             <a href="{% url 'upload_asset' %}" style="padding: 10px; background: #eee; text-decoration: none; border-radius: 5px;">
+            + Загрузить модель
+        </a>
+        </p>
         <ul>
             {% for asset in assets %}
                 <li>
