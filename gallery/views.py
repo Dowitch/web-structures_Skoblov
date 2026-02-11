@@ -1,5 +1,8 @@
-from django.shortcuts import render
+from django.contrib import messages
+from django.shortcuts import render, redirect
 from .models import Asset
+from .forms import AssetForm
+
 def about(request):
     context_data = {
         'page_title': 'О проекте',
@@ -16,5 +19,16 @@ def home(request):
         'assets': assets, # Передаем весь список
     }
     return render(request, 'gallery/index.html', context_data)
+
+
 def upload(request):
-    return render(request, 'gallery/upload.html')
+    if request.method == 'POST':
+        form = AssetForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Файл загружен')
+            return redirect('home')
+    else:
+        form = AssetForm()
+    return render(request, 'gallery/upload.html', {'form': form})

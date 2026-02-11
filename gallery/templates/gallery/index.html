@@ -1,38 +1,73 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+<head>    
     <meta charset="UTF-8">
     <title>3D Storage</title>
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    {% load static%}
+    <link rel="stylesheet" href="{% static 'gallery/style.css' %}">
 </head>
 <body>
-    <header>
+   <header>
         <h1>{{ page_title }}</h1>
+        <!-- Ссылка на загрузку теперь выглядит как кнопка -->
+        <a href="{% url 'upload' %}" class="btn" style="background-color: #28a745;">+Загрузить модель</a>
     </header>
+
    <main>
-        <h2>Доступные ассеты:</h2>
-        <!-- Цикл for в шаблоне Django -->
-        <p>
-             <a href="{% url 'upload_asset' %}" style="padding: 10px; background: #eee; text-decoration: none; border-radius: 5px;">
-            + Загрузить модель
-        </a>
-        </p>
-        <ul>
+       <!-- Контейнер сетки -->
+        <div class="gallery-grid">
             {% for asset in assets %}
-                <li>
-                    <strong>{{ asset.title }}</strong>
-                    <small>(Размер: {{ asset.file_size|filesizeformat }})</small>
-                    <!-- Ссылка-заглушка -->
-                    <a href="{{asset.file.url}}" download>[Скачать]</a>
-                </li>
-            {% empty %}
-            <!-- Этот блок сработает, если список assets пустой -->
-                <li>Нет доступных моделей.</li>
-            {% endfor %}
-        </ul>
-        <a href="http://127.0.0.1:8000/about">[О нас]</a>
+            <!-- Карточка -->
+                <div class="asset-card">
+                <!-- 1. Превью (Верхняя часть) -->
+                <!-- Пока здесь просто серый квадрат с иконкой куба -->
+                <!-- На 6-й неделе здесь будет картинка, на 5-й - 3D сцена -->
+                <div class="card-preview"
+                    id="model-container-{{ asset.id }}"
+                    data-url="{{ asset.file.url }}">
+
+                    Wait...
+                </div>
+            <!-- 2. Информация (Нижняя часть) -->
+                <div class="card-info">
+                    <h3 class="card-title">{{ asset.title }}</h3>
+                    <div class="card-meta">
+                        <span>📅 {{ asset.created_at|date:"d M Y" }}</span>
+                        <!-- Если есть файл, показываем размер -->
+                        {% if asset.file %}
+                            <span style="float: right;">💾 {{ asset.file.size|filesizeformat }}</span>
+                        {% endif %}
+                    </div>
+                <!-- Кнопка скачивания -->
+                    {% if asset.file %}
+                        <a href="{{ asset.file.url }}" class="btn" download>Скачать.glb</a>
+                    {% else %}
+                        <span style="color: red;">Файл потерян</span>
+                    {% endif %}
+                </div>
+                </div>
+        {% empty %}
+            <p>База пуста.</p>
+        {% endfor %}
+
+        </div>
     </main>
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p style="color: green; font-weight: bold;">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
     <footer>
-        <p>&copy; 2024 Web Structures Course</p>
+        <p>&copy; 2026 Web Structures Course</p>
     </footer>
 </body>
 </html>

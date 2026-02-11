@@ -27,7 +27,7 @@ urlpatterns = [
 path('admin/', admin.site.urls),
 path('', home, name='home'),
 path('about/', about, name='about'),
-path('upload/', upload, name='upload_asset'),
+path('upload/', upload, name='upload'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
