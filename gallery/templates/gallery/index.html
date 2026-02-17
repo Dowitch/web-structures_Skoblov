@@ -4,12 +4,14 @@
 <head>    
     <meta charset="UTF-8">
     <title>3D Storage</title>
+    <script type="importmap">
     {
         "imports": {
             "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
             "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
         }
     }
+    </script>
     {% load static%}
     <link rel="stylesheet" href="{% static 'gallery/style.css' %}">
 </head>
@@ -69,5 +71,17 @@
     <footer>
         <p>&copy; 2026 Web Structures Course</p>
     </footer>
+    <script type="module">
+        import { loadModel } from "{% static 'gallery/js/viewer.js' %}";
+        const containers = document.querySelectorAll('.card-preview');
+        
+        containers.forEach(container =>{
+            const id =container.id;
+            const url = container.dataset.url;
+            if(url){
+                loadModel(id,url);
+            }
+        })
+    </script>
 </body>
 </html>
