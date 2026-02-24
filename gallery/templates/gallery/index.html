@@ -23,42 +23,39 @@
     </header>
 
    <main>
-       <!-- Контейнер сетки -->
         <div class="gallery-grid">
             {% for asset in assets %}
-            <!-- Карточка -->
                 <div class="asset-card">
-                <!-- 1. Превью (Верхняя часть) -->
-                <!-- Пока здесь просто серый квадрат с иконкой куба -->
-                <!-- На 6-й неделе здесь будет картинка, на 5-й - 3D сцена -->
-                <div class="card-preview"
-                    id="model-container-{{ asset.id }}"
-                    data-url="{{ asset.file.url }}">
+                    <div class="card-preview js-load-3d"
+                        id="model-container-{{ asset.id }}"
+                        data-url="{{ asset.file.url }}"
+                        {% if asset.image %}style="background-image:url('{{ asset.image.url }}');"{% endif %}>
+                    {% if asset.image %}
+                        <div class="play-btn">▶</div>
+                    {% else %}
+                        <span style="font-size: 2rem;">🎲</span>
+                    {% endif %}
+                    </div>
 
-                    Wait...
-                </div>
-            <!-- 2. Информация (Нижняя часть) -->
-                <div class="card-info">
-                    <h3 class="card-title">{{ asset.title }}</h3>
-                    <div class="card-meta">
+                    <div class="card-info">
+                        <h3 class="card-title">{{ asset.title }}</h3>
+                        <div class="card-meta">
                         <span>📅 {{ asset.created_at|date:"d M Y" }}</span>
-                        <!-- Если есть файл, показываем размер -->
                         {% if asset.file %}
-                            <span style="float: right;">💾 {{ asset.file.size|filesizeformat }}</span>
+                            <span style="float:right;">💾 {{ asset.file.size|filesizeformat }}</span>
+                        {% endif %}
+                        </div>
+
+                        {% if asset.file %}
+                            <a href="{{ asset.file.url }}" class="btn" download>Скачать.glb</a>
+                        {% else %}
+                            <span style="color:red;">Файл потерян</span>
                         {% endif %}
                     </div>
-                <!-- Кнопка скачивания -->
-                    {% if asset.file %}
-                        <a href="{{ asset.file.url }}" class="btn" download>Скачать.glb</a>
-                    {% else %}
-                        <span style="color: red;">Файл потерян</span>
-                    {% endif %}
                 </div>
-                </div>
-        {% empty %}
-            <p>База пуста.</p>
-        {% endfor %}
-
+            {% empty %}
+                <p>База пуста.</p>
+            {% endfor %}
         </div>
     </main>
     {% if messages %}
@@ -72,16 +69,34 @@
         <p>&copy; 2026 Web Structures Course</p>
     </footer>
     <script type="module">
-        import { loadModel } from "{% static 'gallery/js/viewer.js' %}";
-        const containers = document.querySelectorAll('.card-preview');
-        
-        containers.forEach(container =>{
-            const id =container.id;
-            const url = container.dataset.url;
-            if(url){
-                loadModel(id,url);
+    import { loadModel } from "{% static 'gallery/js/viewer.js' %}";
+    // Находим все блоки, готовые к 3D
+    const containers = document.querySelectorAll('.js-load-3d');
+    containers.forEach(container => {
+        // Вешаем слушатель клика на каждую карточку
+        container.addEventListener('click', function() {
+            
+            // Проверка: Если внутри уже есть canvas, значит модель уже загружена
+            if (this.querySelector('canvas')) return;
+            // 1. Убираем кнопку Play (очищаем контент)
+            // Но оставляем фон, пока не появится Canvas, чтобы не мигало белым
+            this.innerHTML = '';
+            
+            // 2. Добавляем спиннер (визуально для пользователя)
+            // (Тот самый лоадер, который мы делали на прошлой неделе, появится сам внутри loadModel)
+            // 3. Запускаем загрузку 3D
+            const id = this.id;
+            const url = this.dataset.url;
+            
+            if (url) {
+                console.log("Загружаю 3D по требованию:", url);
+                loadModel(id, url);
+                
+                // Убираем фоновую картинку, когда 3D загрузится?
+                // loadModel сам очистит innerHTML и перекроет фон канвасом.
             }
-        })
-    </script>
+        });
+    });
+</script>
 </body>
 </html>
