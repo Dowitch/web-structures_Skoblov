@@ -1,0 +1,180 @@
+{% load static %}
+{% load gallery_extras %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Storage</title>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'gallery/style.css' %}">
+</head>
+<body>
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <header class="page-header">
+        <h1>{{ page_title }}</h1>
+        <div class="header-actions">
+            <a href="{% url 'upload' %}" class="btn upload-btn">+Загрузить модель</a>
+            <button id="theme-toggle" class="btn theme-toggle-btn" type="button">🌙 Тёмная тема</button>
+        </div>
+    </header>
+
+    <div class="toolbar">
+        <form action="{% url 'home' %}" method="get" class="toolbar-form">
+            <input
+                type="text"
+                name="q"
+                class="search-input"
+                placeholder="Найти 3D модель..."
+                value="{{ request.GET.q|default:'' }}"
+            >
+
+            <select name="ordering" class="sort-select" onchange="this.form.submit()">
+                <option value="new" {% if request.GET.ordering == 'new' %}selected{% endif %}>Сначала новые</option>
+                <option value="old" {% if request.GET.ordering == 'old' %}selected{% endif %}>Сначала старые</option>
+                <option value="name" {% if request.GET.ordering == 'name' %}selected{% endif %}>По имени (А-Я)</option>
+            </select>
+
+            <button type="submit" class="search-btn">Найти</button>
+
+            {% if request.GET.q or request.GET.ordering %}
+                <a href="{% url 'home' %}" class="reset-link">✖ Сбросить</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <main>
+        <div class="gallery-grid">
+            {% for asset in page_obj %}
+                <div class="asset-card">
+                    <div
+                        class="card-preview js-load-3d"
+                        id="model-container-{{ asset.id }}"
+                        data-url="{{ asset.file.url }}"
+                        {% if asset.image %}style="background-image:url('{{ asset.image.url }}');"{% endif %}
+                    >
+                        {% if asset.image %}
+                            <div class="play-btn">▶</div>
+                        {% else %}
+                            <span class="dice-placeholder">🎲</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-info">
+                        <h3 class="card-title">{{ asset.title }}</h3>
+                        <div class="card-meta">
+                            <span>📅 {{ asset.created_at|date:"d M Y" }}</span>
+                            {% if asset.file %}
+                                <span class="file-size">💾 {{ asset.file.size|filesizeformat }}</span>
+                            {% endif %}
+                        </div>
+
+                        {% if asset.file %}
+                            <a href="{{ asset.file.url }}" class="btn" download>Скачать .glb</a>
+                        {% else %}
+                            <span class="missing-file">Файл потерян</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    {% if request.GET.q %}
+                        <h3>По запросу "<b>{{ request.GET.q }}</b>" ничего не найдено</h3>
+                        <p>Попробуйте изменить запрос или <a href="{% url 'home' %}">сбросить фильтры</a>.</p>
+                    {% else %}
+                        <h3>База пуста</h3>
+                        <p>Загрузите первую модель.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?{% param_replace request page=1 %}">&laquo; Первая</a>
+                    <a href="?{% param_replace request page=page_obj.previous_page_number %}">Назад</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?{% param_replace request page=page_obj.next_page_number %}">Далее</a>
+                    <a href="?{% param_replace request page=page_obj.paginator.num_pages %}">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Web Structures Course</p>
+    </footer>
+
+    <script type="module">
+        import { loadModel } from "{% static 'gallery/js/viewer.js' %}";
+
+        const containers = document.querySelectorAll('.js-load-3d');
+
+        containers.forEach(container => {
+            container.addEventListener('click', function() {
+                if (this.querySelector('canvas')) return;
+
+                this.style.backgroundImage = 'none';
+                this.innerHTML = '';
+
+                const id = this.id;
+                const url = this.dataset.url;
+
+                if (url) {
+                    console.log('Загружаю 3D по требованию:', url);
+                    loadModel(id, url);
+                }
+            });
+        });
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const isDark = document.documentElement.classList.contains('dark-theme');
+
+        themeToggleBtn.textContent = isDark ? '☀ Светлая тема' : '🌙 Тёмная тема';
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark-theme');
+
+            const darkEnabled = document.documentElement.classList.contains('dark-theme');
+
+            if (darkEnabled) {
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.textContent = '☀ Светлая тема';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.textContent = '🌙 Тёмная тема';
+            }
+        });
+    </script>
+</body>
+</html>

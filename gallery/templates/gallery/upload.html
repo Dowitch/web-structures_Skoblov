@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузка модели</title>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+        }
+    </script>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="{% static 'gallery/upload.css' %}">
+</head>
+<body>
+    <div class="upload-wrapper">
+        <div class="upload-card">
+            <div class="upload-header">
+                <h1 class="upload-title">Загрузить новую модель</h1>
+                <a href="{% url 'home' %}" class="btn btn-secondary">Вернуться на главную</a>
+            </div>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+
+                <div class="preview-section">
+                    <p>Авто-генерация превью:</p>
+                    <div id="preview-container">
+                        <span class="preview-placeholder">Выберите файл...</span>
+                    </div>
+                    <input type="hidden" name="image_data" id="id_image_data">
+                </div>
+
+                <div class="actions">
+                    <button type="submit" id="submit-btn" class="btn" disabled>Загрузить в базу</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="{% static 'gallery/js/autothumb.js' %}"></script>
+</body>
+</html>
